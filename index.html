@@ -1,52 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>H4R Heartbeat 70 BPM Animation</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>H4R Heartbeat Animation</title>
 <style>
   html,body{
     margin:0;padding:0;overflow:hidden;background:transparent;
     width:100%;height:100%;
   }
   .container{
-    position:relative;width:500px;height:500px;
+    position:relative;
+    width:600px;height:600px;
     margin:auto;top:50%;transform:translateY(-50%);
   }
   .big-heart{
     position:absolute;inset:0;
-    background:url('h4r-logo-heart.png') no-repeat center/contain;
+    background:url('big-heart.png') no-repeat center/contain;
     z-index:1;
     transform-origin:center;
     filter:drop-shadow(0 0 20px rgba(255,110,160,0.6));
   }
+  .h4r-text{
+    position:absolute;inset:0;
+    background:url('h4r-text.png') no-repeat center/contain;
+    z-index:2;
+  }
   .small-heart{
-    position:absolute;width:140px;height:140px;
-    background:linear-gradient(to bottom,#ffb3d9 0%,#ff0048 100%);
-    border-radius:50% 50% 40% 40%;
-    transform:rotate(-45deg);
-    top:15%;left:68%;z-index:2;
-    filter:drop-shadow(0 0 20px rgba(255,120,170,.6));
+    position:absolute;
+    width:180px;height:180px;
+    background:url('small-heart.png') no-repeat center/contain;
+    top:10%;left:70%;
+    transform-origin:center center;
+    z-index:3;
+    filter:drop-shadow(0 0 20px rgba(255,120,170,0.6));
   }
-  .small-heart::before,.small-heart::after{
-    content:'';position:absolute;width:140px;height:140px;
-    background:linear-gradient(to bottom,#ffb3d9 0%,#ff0048 100%);
-    border-radius:50%;
-  }
-  .small-heart::before{top:-70px;left:0;}
-  .small-heart::after{top:0;left:70px;}
 </style>
 </head>
 <body>
 <div class="container">
   <div class="big-heart" id="bigHeart"></div>
+  <div class="h4r-text"></div>
   <div class="small-heart" id="smallHeart"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script>
 const bpm = 70;
-const beatDur = 60 / bpm; // seconds per beat ≈ 0.857 s
+const beatDur = 60 / bpm; // ~0.857 s per beat
 const bigHeart = document.getElementById('bigHeart');
 const smallHeart = document.getElementById('smallHeart');
 
@@ -56,22 +57,22 @@ function masterSequence(){
 
   const tl = gsap.timeline({repeat:-1,repeatDelay:1});
 
-  // --- Slide In ---
+  // Slide In
   tl.to(smallHeart,{duration:1.2,x:0,y:0,ease:"power2.out"});
 
-  // --- Spin + heartbeat sync ---
+  // Spin + heartbeat sync
   tl.add(()=>syncBeats(7),"-=0.1");
   tl.to(smallHeart,{duration:6,rotation:360*4,ease:"none"});
 
-  // --- Pause (slow heartbeats) ---
-  tl.add(()=>syncBeats(2),"-=0.2");
+  // Pause + slower heartbeats
+  tl.add(()=>syncBeats(2),"-=0.1");
   tl.to({}, {duration:2});
 
-  // --- Slide Out ---
+  // Slide Out
   tl.to(smallHeart,{duration:1.2,x:300,y:-150,ease:"power2.in"});
 }
 
-// 🔄 70 BPM heartbeats
+// Both hearts pulse together every beat
 function syncBeats(beats){
   const beatTL = gsap.timeline({repeat:beats-1});
   beatTL.to([bigHeart,smallHeart],{
