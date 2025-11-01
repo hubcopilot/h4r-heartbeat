@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>H4R 3D Heart</title>
+  <meta charset="UTF-8">
+  <title>3D H4R Animated Logo</title>
   <style>
-    body { margin: 0; background: #ffbcd9; overflow: hidden; }
+    body { margin: 0; background: radial-gradient(circle, #ffd6e9 0%, #ff9acb 100%); overflow: hidden; }
     canvas { display: block; }
   </style>
 </head>
@@ -12,76 +12,147 @@
 <script type="module">
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js";
+import { FontLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/FontLoader.js";
+import { TextGeometry } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/geometries/TextGeometry.js";
+import { CSG } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/geometry/CSG.js";
+import TWEEN from "https://cdn.jsdelivr.net/npm/@tweenjs/tween.js@18.6.4/dist/tween.esm.js";
 
-// Scene, Camera, Renderer
+// --- Scene Setup ---
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 1000);
-camera.position.set(0, 0, 5);
+camera.position.set(0, 1.2, 6);
+
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(innerWidth, innerHeight);
 renderer.setClearColor(0x000000, 0);
 document.body.appendChild(renderer.domElement);
 
-// Lighting
-const light = new THREE.DirectionalLight(0xffffff, 1.5);
-light.position.set(5, 5, 5);
-scene.add(light);
-scene.add(new THREE.AmbientLight(0xffc0cb, 0.7));
+// --- Lights ---
+scene.add(new THREE.AmbientLight(0xffb6d9, 0.7));
+const dirLight = new THREE.DirectionalLight(0xffffff, 1.3);
+dirLight.position.set(4, 5, 5);
+scene.add(dirLight);
 
-// Create Heart Shape
-const x = 0, y = 0;
-const heartShape = new THREE.Shape();
-heartShape.moveTo(x + 0.25, y + 0.25);
-heartShape.bezierCurveTo(x + 0.25, y + 0.25, x + 0.20, y, x, y);
-heartShape.bezierCurveTo(x - 0.3, y, x - 0.3, y + 0.35, x - 0.3, y + 0.35);
-heartShape.bezierCurveTo(x - 0.3, y + 0.55, x - 0.1, y + 0.77, x + 0.25, y + 1.0);
-heartShape.bezierCurveTo(x + 0.6, y + 0.77, x + 0.8, y + 0.55, x + 0.8, y + 0.35);
-heartShape.bezierCurveTo(x + 0.8, y + 0.35, x + 0.8, y, x + 0.5, y);
-heartShape.bezierCurveTo(x + 0.35, y, x + 0.25, y + 0.25, x + 0.25, y + 0.25);
+// --- Main Big Heart ---
+const bigHeartShape = new THREE.Shape();
+bigHeartShape.moveTo(0, 0);
+bigHeartShape.bezierCurveTo(0, 0, -1.2, -1.2, -2, 0);
+bigHeartShape.bezierCurveTo(-2, 1.2, 0, 2.5, 0, 3);
+bigHeartShape.bezierCurveTo(0, 2.5, 2, 1.2, 2, 0);
+bigHeartShape.bezierCurveTo(1.2, -1.2, 0, 0, 0, 0);
 
-const extrudeSettings = {
-  depth: 0.4,
+const bigHeartGeo = new THREE.ExtrudeGeometry(bigHeartShape, {
+  depth: 0.5,
   bevelEnabled: true,
-  bevelSegments: 2,
-  steps: 2,
+  bevelThickness: 0.1,
   bevelSize: 0.1,
-  bevelThickness: 0.1
-};
-
-const geometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
-const material = new THREE.MeshStandardMaterial({
-  color: 0xff4c8b,
-  metalness: 0.3,
-  roughness: 0.2,
+  bevelSegments: 5
 });
-const heartMesh = new THREE.Mesh(geometry, material);
-heartMesh.rotation.x = Math.PI;
-scene.add(heartMesh);
-
-// Transparent “H4R” Overlay
-const textureLoader = new THREE.TextureLoader();
-const h4rTexture = textureLoader.load("h4r-text-transparent.png"); // <-- replace with your PNG path
-const h4rMaterial = new THREE.MeshBasicMaterial({
-  map: h4rTexture,
-  transparent: true,
+const bigHeartMat = new THREE.MeshStandardMaterial({
+  color: 0xff4f8b,
+  metalness: 0.4,
+  roughness: 0.3
 });
-const h4rPlane = new THREE.Mesh(new THREE.PlaneGeometry(2.5, 2.5), h4rMaterial);
-h4rPlane.position.z = 0.25;
-scene.add(h4rPlane);
+const bigHeartMesh = new THREE.Mesh(bigHeartGeo, bigHeartMat);
+bigHeartMesh.rotation.x = Math.PI;
+scene.add(bigHeartMesh);
+
+// --- Text with Heart Cutout in R ---
+const fontLoader = new FontLoader();
+fontLoader.load("https://threejs.org/examples/fonts/helvetiker_bold.typeface.json", (font) => {
+  const textGeo = new TextGeometry("H4R", {
+    font,
+    size: 1,
+    height: 0.3,
+    bevelEnabled: true,
+    bevelThickness: 0.05,
+    bevelSize: 0.05,
+    bevelSegments: 6,
+  });
+
+  const textMat = new THREE.MeshStandardMaterial({
+    color: 0xffe3f2,
+    metalness: 0.4,
+    roughness: 0.2,
+  });
+
+  const textMesh = new THREE.Mesh(textGeo, textMat);
+  textGeo.computeBoundingBox();
+  const offsetX = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
+  textMesh.position.set(offsetX, 0.4, 0.3);
+  textMesh.rotation.x = Math.PI;
+
+  // Heart cutout for R
+  const cutShape = new THREE.Shape();
+  cutShape.moveTo(0, 0.5);
+  cutShape.bezierCurveTo(-0.35, 0.5, -0.65, 0.2, -0.65, -0.1);
+  cutShape.bezierCurveTo(-0.65, -0.45, -0.3, -0.7, 0, -0.35);
+  cutShape.bezierCurveTo(0.3, -0.7, 0.65, -0.45, 0.65, -0.1);
+  cutShape.bezierCurveTo(0.65, 0.2, 0.35, 0.5, 0, 0.5);
+
+  const cutGeo = new THREE.ExtrudeGeometry(cutShape, {
+    depth: 0.4,
+    bevelEnabled: true,
+    bevelThickness: 0.05,
+    bevelSize: 0.05,
+    bevelSegments: 5,
+  });
+
+  const cutMesh = new THREE.Mesh(cutGeo);
+  cutMesh.position.set(1.6, 0.55, 0.15);
+  cutMesh.scale.set(0.35, 0.35, 0.35);
+  cutMesh.rotation.x = Math.PI;
+
+  // Combine text and heart cutout
+  const combined = CSG.subtract(textMesh, cutMesh);
+  scene.add(combined);
+
+  // --- Small Heart (Animated) ---
+  const smallHeart = new THREE.Mesh(bigHeartGeo.clone(), bigHeartMat.clone());
+  smallHeart.scale.set(0.4, 0.4, 0.4);
+  smallHeart.rotation.x = Math.PI;
+  smallHeart.position.set(3, 3, 0.3);
+  scene.add(smallHeart);
+
+  // --- Animation Logic ---
+  function animateIn() {
+    new TWEEN.Tween(smallHeart.position)
+      .to({ x: 1.4, y: 1.8, z: 0.3 }, 1500)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .onComplete(spinHeart)
+      .start();
+  }
+
+  function spinHeart() {
+    new TWEEN.Tween(smallHeart.rotation)
+      .to({ z: smallHeart.rotation.z + Math.PI * 8 }, 6000)
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .onComplete(() => setTimeout(animateOut, 2000))
+      .start();
+  }
+
+  function animateOut() {
+    new TWEEN.Tween(smallHeart.position)
+      .to({ x: 3, y: 3, z: 0.3 }, 1500)
+      .easing(TWEEN.Easing.Quadratic.In)
+      .onComplete(() => setTimeout(animateIn, 1500))
+      .start();
+  }
+
+  animateIn();
+
+  // --- Animate Loop ---
+  function animate() {
+    requestAnimationFrame(animate);
+    TWEEN.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+});
 
 // Controls
-const controls = new OrbitControls(camera, renderer.domElement);
+new OrbitControls(camera, renderer.domElement);
 
-// Animation
-function animate() {
-  requestAnimationFrame(animate);
-  heartMesh.rotation.y += 0.01;
-  h4rPlane.rotation.y += 0.01;
-  renderer.render(scene, camera);
-}
-animate();
-
-// Handle resize
 window.addEventListener("resize", () => {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
