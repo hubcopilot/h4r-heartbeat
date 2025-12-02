@@ -1,4 +1,4 @@
-/* Make background transparent for OBS */
+/* Transparent background for OBS */
 html,
 body {
   margin: 0;
@@ -9,14 +9,14 @@ body {
   background: transparent;
 }
 
-/* Full-screen container, 16:9 friendly but scales */
+/* Full-screen container */
 #overlay {
   position: fixed;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none; /* so clicks pass through if needed */
+  pointer-events: none;
 }
 
 /* Canvas behind everything */
@@ -29,74 +29,45 @@ body {
   pointer-events: none;
 }
 
-/* Common image styling */
+/* Base image styling */
 #overlay img {
   position: absolute;
-  max-width: 60vmin; /* scales with viewport */
+  max-width: 60vmin; /* scales nicely on 16:9 */
   height: auto;
   image-rendering: auto;
-}
-
-/* Starting states */
-#christmasLogo {
-  opacity: 1;
-  transform: translate3d(0, 0, 0) scale(1);
-  transition: opacity 0.8s ease, transform 0.8s ease;
-}
-
-#dayScreen {
   opacity: 0;
-  transform: translate3d(0, 10px, 0) scale(0.95);
-  filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.7));
-  transition: opacity 0.9s ease, transform 0.9s ease, filter 0.9s ease;
+  transition: opacity 1.2s ease-in-out;
 }
 
-/* Explosion phase — Christmas logo shakes and shrinks */
-.exploding #christmasLogo {
-  opacity: 0;
-  transform: scale(0.6);
-}
-
-/* Icy screen visible */
-.icy #dayScreen {
+/* Visible / hidden states */
+.show {
   opacity: 1;
-  transform: translate3d(0, 0, 0) scale(1);
-  filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.9));
 }
 
-/* Subtle idle breathing for the active image */
-.breathe {
-  animation: breathe 3s ease-in-out infinite;
+.hide {
+  opacity: 0;
 }
 
-@keyframes breathe {
+/* Pulsing heart (for H4R Christmas logo) */
+.pulse {
+  animation: pulse 2.8s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+@keyframes pulse {
   0% {
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.04);
   }
   50% {
-    transform: translate3d(0, -4px, 0) scale(1.02);
+    transform: scale(1.08);
+  }
+  70% {
+    transform: scale(1.04);
   }
   100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-}
-
-/* Shake effect during “explode” */
-.shake {
-  animation: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-}
-
-@keyframes shake {
-  10%, 90% {
-    transform: translate3d(-2px, 0, 0);
-  }
-  20%, 80% {
-    transform: translate3d(4px, 0, 0);
-  }
-  30%, 50%, 70% {
-    transform: translate3d(-6px, 0, 0);
-  }
-  40%, 60% {
-    transform: translate3d(6px, 0, 0);
+    transform: scale(1);
   }
 }
